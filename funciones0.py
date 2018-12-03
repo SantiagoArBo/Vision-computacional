@@ -2,17 +2,19 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 def estanteria(img1,ubicacion):# Encuentra las esquinas del estante. Ubicacion = True, si está en el proceso de busqueda. Ubicacion = False, si está en el clasificacdor
-    Lower = 15
-    Upper = 64
     total = len(img1)
     hsv = cv2.cvtColor(img1, cv2.COLOR_BGR2HSV)
     hsv1 = hsv[:,:,0]
     if ubicacion:
+        Lower = 2
+        Upper = 70
         kernel = np.ones((3,3),np.uint8())
         th = cv2.inRange(hsv1, Lower, Upper)
-        th = cv2.erode(th,kernel,iterations=4)
-        th = cv2.dilate(th,kernel,iterations=5)
+        th = cv2.dilate(th,kernel,iterations=3)
+        th = cv2.erode(th,kernel,iterations=6)
     else:
+        Lower = 15
+        Upper = 64
         kernel = np.ones((3,3),np.uint8())
         th = cv2.inRange(hsv1, Lower, Upper)
         th = cv2.dilate(th,kernel,iterations=8)
@@ -205,6 +207,14 @@ def clasificador2(estantes, referencia,puntos,puntos_referencia,obj): #Parte de 
         minima_diferencia = 0.5
     elif obj == 'citrus':
         minima_diferencia = 1.5
+    elif obj == 'casquitos':
+        minima_diferencia = 1.2
+    elif obj == 'chocoramo':
+        minima_diferencia = 2.4
+    elif obj == 'pringles':
+        minima_diferencia = 1.8
+    elif obj == 'manzana roja':
+        minima_diferencia = 1.75
     else:
         minima_diferencia = 1.12
     relacion = relacionPixelDistancia(puntos,'X')
@@ -346,6 +356,7 @@ def correcciones(esquinas,img): #Determina si la estanteria esta bie posicionada
     derecha = False
     giroContraManecillas = False
     giroManecillas = False
+    angulo = 0
     if esquinas[0][0][1] == 0 or esquinas[1][0][1] == 0 or (esquinas[2][0][1] == len(img)-1) or (esquinas[3][0][1] == len(img)-1) :
         atras = True
     if esquinas[0][0][0] == 0 or esquinas[2][0][0] == 0:
@@ -357,7 +368,10 @@ def correcciones(esquinas,img): #Determina si la estanteria esta bie posicionada
             giroContraManecillas = True
         else:
             giroManecillas = True
-    return atras, izquierda, derecha, giroContraManecillas, giroManecillas
+        a = abs(esquinas[2][0][1]-esquinas[3][0][1])
+        b = abs(esquinas[2][0][0]-esquinas[3][0][0])
+        angulo = np.arctan(a/b)*180/np.pi
+    return atras, izquierda, derecha, giroContraManecillas, giroManecillas, angulo
 def ubicacionInicial(img): #Determina si la posicion inicial esta mal o bien (da un mensaje que determina que accion se deberia hacer)
     buscando = True
     mensaje = ''
@@ -375,46 +389,46 @@ def ubicacionInicial(img): #Determina si la posicion inicial esta mal o bien (da
         if correccion[2] == True:
             mensaje = mensaje +  ', Derrecha'
         if correccion[3] == True:
-            mensaje = mensaje + ', Giro contra las manecillas del reloj'
+            mensaje = mensaje + ', Giro contra las manecillas del reloj: '+ str(correccion[5])
         if correccion[4] == True:
-            mensaje = mensaje + ', Giro con las manecillas del reloj'
+            mensaje = mensaje + ', Giro con las manecillas del reloj: '+ str(correccion[5])
     return mensaje, buscando
 def noHayObjeto(obj,valor):
     if obj == 'BBQ':
-        if valor < 27900:
+        if valor < 20700:
             valor = 0
     elif obj == 'BEpower':
-        if valor < 7400:
+        if valor < 9100:
             valor = 0
     elif obj == 'casquitos':
-        if valor < 18000:
+        if valor < 19000:
             valor = 0
     elif obj == 'chocoramo':
-        if valor < 15000:
+        if valor < 20200:
             valor = 0
     elif obj == 'citrus':
-        if valor < 8500:
+        if valor < 10200:
             valor = 0
     elif obj == 'coca-cola':
         if valor < 11000:
             valor = 0
     elif obj == 'mix':
-        if valor < 10300:
-            valor = 0
-    elif obj == 'natural':
-        if valor < 20000:
-            valor = 0
-    elif obj == 'pringles':
         if valor < 10500:
             valor = 0
+    elif obj == 'natural':
+        if valor < 26800:
+            valor = 0
+    elif obj == 'pringles':
+        if valor < 10000:
+            valor = 0
     elif obj == 'quatro':
-        if valor < 13000:
+        if valor < 12000:
             valor = 0
     elif obj == 'manzana roja':
         if valor < 10000:
             valor = 0
     elif obj == 'rojos':
-        if valor < 9000:
+        if valor < 11000:
             valor = 0
     elif obj == 'smirnoff':
         if valor < 4500:
@@ -423,9 +437,9 @@ def noHayObjeto(obj,valor):
         if valor < 19000:
             valor = 0
     elif obj == 'tomate':
-        if valor < 25000:
+        if valor < 20000:
             valor = 0
     elif obj == 'manzana verde':
-        if valor < 9000:
+        if valor < 7100:
             valor = 0
     return valor

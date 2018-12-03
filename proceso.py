@@ -22,7 +22,5 @@ def busquedaObjeto(img1,obj):#Entra con la imagen de alta calidad y un string de
         ubicacion = encontrarUbicacion(objeto, imgEstantes, posicion)
         posicion = posicionEspacial(ubicacion,centros,puntos,posicion)
         mensaje = 'Cm en X: '+ str(posicion[0]) + ', Cm en Y: ' + str(posicion[1])
-        mensaje = 'X: '+ str(ubicacion[0]) + ', Y: ' + str(ubicacion[1]) + '. Los valores fueron: '
-        for valor in valores:
-            mensaje = mensaje + str(int(valor)) + ', '
+        #mensaje = 'Estante: '+ str(ubicacion[0]) + ', Objeto: ' + str(ubicacion[1])
     return(mensaje)

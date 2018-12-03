@@ -68,7 +68,7 @@ def main():
 
     if args['image']:
         image = cv2.imread(args['image'])
-
+        image = cv2.resize(image,(320,240), interpolation = cv2.INTER_AREA)
         if range_filter == 'RGB':
             frame_to_thresh = image.copy()
         else:
@@ -100,8 +100,6 @@ def main():
             preview = cv2.bitwise_and(image, image, mask=thresh)
             cv2.imshow("Preview", preview)
         else:
-            image = imutils.resize(image, width=600)
-            thresh = imutils.resize(thresh, width=600)
             cv2.imshow("Original", image)
             cv2.imshow("Thresh", thresh)
 
